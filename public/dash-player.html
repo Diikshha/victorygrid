@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Organizer Dashboard</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+
+    <style>
+      :root {
+        --midnight-navy: #0f172a;
+        --golden-yellow: #facc15;
+        --rich-burgundy: #7f1d1d;
+        --soft-cream: #f8fafc;
+      }
+
+      * {
+        font-family: 'Inter', sans-serif;
+      }
+
+      .bg-midnight {
+        background-color: var(--midnight-navy) !important;
+      }
+
+      .bg-burgundy {
+        background-color: var(--rich-burgundy) !important;
+      }
+
+      .text-golden {
+        color: var(--golden-yellow) !important;
+      }
+
+      .text-cream {
+        color: var(--soft-cream) !important;
+      }
+      body {
+        background: var(--midnight-navy);
+        color: var(--soft-cream);
+      }
+
+      .navbar {
+        background: var(--rich-burgundy);
+      }
+
+      .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+        color: var(--golden-yellow) !important;
+      }
+
+      .hero-section {
+        text-align: center;
+        padding: 80px 20px 40px;
+        background: linear-gradient(to right, var(--midnight-navy), #1e293b);
+        color: var(--soft-cream);
+      }
+
+      .hero-section h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        color: var(--golden-yellow);
+      }
+
+      .hero-section p {
+        font-size: 1.2rem;
+        color: var(--soft-cream);
+        opacity: 0.85;
+      }
+
+      .card-container {
+        padding: 40px 15px;
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .feature-card {
+        width: 320px;
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        background-color: #1e293b;
+        color: var(--soft-cream);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      }
+
+      .feature-card img {
+        height: 220px;
+        object-fit: cover;
+        filter: brightness(0.85);
+      }
+
+      .feature-card .card-body {
+        text-align: center;
+      }
+
+      .feature-card .btn {
+        background-color: var(--golden-yellow);
+        color: var(--midnight-navy);
+        border-radius: 30px;
+        padding: 8px 20px;
+        font-weight: 600;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .feature-card .btn:hover {
+        background-color: var(--rich-burgundy);
+        color: var(--soft-cream);
+      }
+
+      footer {
+        background-color: var(--rich-burgundy);
+        color: var(--soft-cream);
+        padding: 25px 0;
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+  <body ng-controller="dashCtrl" ng-app="myApp">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand fw-bold text-golden fs-4" href="#">
+                <i class="fas fa-trophy me-2"></i> <span id="welcome"></span>
+            </a>
+        <button class="btn bg-midnight text-cream" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <div class="hero-section mt-5 pt-5">
+      <h1>Welcome Player</h1>
+      <p>Manage your tournaments and profile with ease</p>
+    </div>
+
+    <div class="card-container">
+      <div class="card feature-card">
+        <img
+          src="./pics/player-profile.avif"
+          class="card-img-top"
+          alt="Organizer Details"
+        />
+        <div class="card-body">
+          <h5 class="card-title fw-bold text-golden">Player's Profile</h5>
+          <p class="card-text">
+            Keep your profile updated — manage your details, contact information, and stay tournament-ready anytime, anywhere.
+          </p>
+          <a href="./profile-player.html" class="btn">My Profile</a>
+        </div>
+      </div>
+
+      <div class="card feature-card">
+        <img
+          src="./pics/explore2.avif"
+          class="card-img-top"
+          alt="Post Tournament"
+        />
+        <div class="card-body">
+          <h5 class="card-title fw-bold text-golden">Explore Tournament</h5>
+          <p class="card-text">
+            Browse exciting tournaments near you. Discover events by game type, location, or age group — and never miss a match!
+          </p>
+          <a href="./tounamentFinder.html" class="btn">Explore Tournament</a>
+        </div>
+      </div>
+
+
+      <div class="card feature-card">
+        <img
+          src="./pics/settings.jpg"
+          class="card-img-top"
+          alt="Manage Tournament"
+        />
+        <div class="card-body">
+          <h5 class="card-title fw-bold text-golden">Settings</h5>
+          <p class="card-text">
+            Update your password, manage privacy settings, and take full control of your player account and stay updated.
+          </p>
+         <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#passModal">Change Password</button>
+        </div>
+      </div>
+    </div>
+    </div>
+
+
+  
+<div class="modal fade" id="passModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 12px; overflow: hidden;">
+      <div class="modal-header bg-midnight text-golden">
+        <h5 class="modal-title fw-semibold">Change Password</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="background-color: var(--soft-cream);">
+        <div class="mb-3">
+          <label class="form-label fw-medium text-midnight">Old Password</label>
+          <input
+            ng-model="oldpass"
+            ng-change="clearMsg()"
+            type="password"
+            class="form-control"
+            style="border: 1px solid var(--midnight-navy); border-radius: 6px;"
+            placeholder="Enter old password"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-medium text-midnight">New Password</label>
+          <input
+            ng-model="newpass"
+            ng-change="clearMsg()"
+            type="password"
+            class="form-control"
+            style="border: 1px solid var(--midnight-navy); border-radius: 6px;"
+            placeholder="Enter new password"
+            required
+          />
+        </div>
+        <div id="changemsg" class="text-center fw-bold small text-danger mb-2"></div>
+        <button
+          class="btn w-100"
+          style="
+            background-color: var(--golden-yellow);
+            color: var(--midnight-navy);
+            font-weight: 600;
+            border-radius: 8px;"
+          ng-click="changePassword()"
+        >
+          Update Password
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+     <footer class=" py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-cream opacity-75 mb-0">© 2025 VictoryGrid</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-cream opacity-75 text-decoration-none me-3">About</a>
+                    <a href="#" class="text-cream opacity-75 text-decoration-none me-3">Terms of Service</a>
+                    <a href="#" class="text-cream opacity-75 text-decoration-none me-3">Conatct</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+function checkPlayerLogin() {
+    let user = localStorage.getItem("activeUser");
+    let usertype = localStorage.getItem("usertype");
+    if (!user || usertype !== "Player") {
+        alert("⚠️ Please login first!");
+        location.href = "index.html";
+    }
+    document.getElementById("welcome").innerText = user;
+}
+
+function logout() {
+    localStorage.clear();
+    alert("✅ Logged out successfully!");
+    location.href = "index.html";
+}
+
+angular.module("myApp", []).controller("dashCtrl", function ($scope, $http) {
+    $scope.changePassword = function () {
+        if (!$scope.oldpass || !$scope.newpass) {
+            document.getElementById("changemsg").innerHTML = "❌ Fill all fields.";
+            return;
+        }
+
+        $http.post("/change-password", {
+            emailid: localStorage.getItem("activeUser"),
+            oldpassword: $scope.oldpass.trim(),
+            newpassword: $scope.newpass.trim()
+        }).then(function (res) {
+            document.getElementById("changemsg").innerHTML = res.data;
+            $scope.oldpass = "";
+            $scope.newpass = "";
+
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('passModal')).hide();
+                document.getElementById("changemsg").innerHTML = "";
+            }, 1000);
+        }, function (err) {
+            document.getElementById("changemsg").innerHTML = err.data || " Error changing password";
+        });
+    };
+
+    $scope.clearMsg = function () {
+        document.getElementById("changemsg").innerHTML = "";
+    };
+});
+
+window.onload = function () {
+    checkPlayerLogin();
+    angular.bootstrap(document, ['myApp']);
+};
+</script>
+
+  </body>
+</html>
+
+

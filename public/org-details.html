@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Organizer Details</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+      :root {
+        --midnight-navy: #0f172a;
+        --golden-yellow: #facc15;
+        --rich-burgundy: #7f1d1d;
+        --soft-cream: #f8fafc;
+      }
+
+      * {
+        font-family: "Inter", sans-serif;
+      }
+
+      .bg-midnight {
+        background-color: var(--midnight-navy) !important;
+      }
+
+      .bg-softcream {
+        background-color: var(--soft-cream) !important;
+      }
+
+      .bg-burgundy {
+        background-color: var(--rich-burgundy) !important;
+      }
+
+      .text-golden {
+        color: var(--golden-yellow) !important;
+      }
+
+      .text-cream {
+        color: var(--soft-cream) !important;
+      }
+      body {
+        background-color: #f8f9fa;
+        padding-top: 20px;
+      }
+      .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+      }
+      .form-container {
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-top: 90px;
+        margin-bottom: 50px;
+      }
+      #preview {
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      #preview img {
+        width: 85%;
+        height: 85%;
+        object-fit: cover;
+      }
+      footer {
+        background-color: var(--rich-burgundy);
+        color: var(--soft-cream);
+        padding: 25px 0;
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+  <body onload="loadOrgDetails()">
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-burgundy fixed-top shadow"
+    >
+      <div class="container d-flex justify-content-between">
+        <a class="navbar-brand fw-bold text-warning" href="#"
+          >Organizer Details Form</a
+        >
+        <span class="text-white">
+          <span id="welcome" style="font-size: 20px"></span
+        ></span>
+      </div>
+    </nav>
+
+    <div class="container pt-5 .bg-softcream">
+      <form
+        class="form-container mt-4"
+        id="org-details"
+        method="POST"
+        action="/save-org-details"
+        enctype="multipart/form-data"
+      >
+        <div class="mb-3">
+          <label class="form-label">Email ID</label>
+          <input
+            type="email"
+            class="form-control"
+            name="emailid"
+            id="emailid"
+            readonly
+          />
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Organization Name</label>
+            <input
+              type="text"
+              class="form-control"
+              name="orgname"
+              id="orgname"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Registration Number</label>
+            <input
+              type="text"
+              class="form-control"
+              name="regnumber"
+              id="regnumber"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              name="address"
+              id="address"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">City</label>
+            <input
+              type="text"
+              class="form-control"
+              name="city"
+              id="city"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Deals in Sports</label>
+          <input
+            type="text"
+            class="form-control"
+            name="sports"
+            id="sports"
+            required
+          />
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Website</label>
+            <input
+              type="url"
+              class="form-control"
+              name="website"
+              id="website"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Instagram Link</label>
+            <input
+              type="url"
+              class="form-control"
+              name="insta"
+              id="insta"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Organization Head</label>
+            <input
+              type="text"
+              class="form-control"
+              name="head"
+              id="head"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Contact Number</label>
+            <input
+              type="tel"
+              class="form-control"
+              name="contact"
+              id="contact"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-8">
+            <label class="form-label">Registration Certificate</label>
+            <input
+              type="file"
+              class="form-control"
+              name="picurl"
+              id="picurl"
+              required
+            />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label d-block">Preview</label>
+            <div class="border rounded text-center bg-light" id="preview">
+              <span>Preview Area</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Other Information</label>
+          <textarea
+            class="form-control"
+            rows="4"
+            name="otherinfo"
+            id="otherinfo"
+            required
+          ></textarea>
+        </div>
+
+        <div class="text-center">
+          <button
+            type="submit"
+            class="btn bg-midnight text-cream me-2"
+            id="saveBtn"
+          >
+            Save Details
+          </button>
+          <button type="button" class="btn btn-warning" id="modifyBtn">
+            Modify Details
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <footer class="py-4">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <p class="text-cream opacity-75 mb-0">© 2025 VictoryGrid</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#" class="text-cream opacity-75 text-decoration-none me-3"
+              >About</a
+            >
+            <a href="#" class="text-cream opacity-75 text-decoration-none me-3"
+              >Terms of Service</a
+            >
+            <a href="#" class="text-cream opacity-75 text-decoration-none me-3"
+              >Conatct</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      function loadOrgDetails() {
+        let email = localStorage.getItem("activeUser");
+        if (!email) {
+          alert("Please Login First");
+          window.location.href = "index.html";
+          return;
+        }
+        $("#welcome").text(email);
+        $("#emailid").val(email);
+
+        $.get("/get-org-details", { emailid: email }, function (data) {
+          if (data) {
+            $("#orgname").val(data.orgname);
+            $("#regnumber").val(data.regnumber);
+            $("#address").val(data.address);
+            $("#city").val(data.city);
+            $("#sports").val(data.sports);
+            $("#website").val(data.website);
+            $("#insta").val(data.insta);
+            $("#head").val(data.head);
+            $("#contact").val(data.contact);
+            $("#otherinfo").val(data.otherinfo);
+            $("#preview").html(
+              `<img src='${data.picurl}' style="width:85%; height:85%; object-fit:cover;">`
+            );
+          }
+        });
+      }
+
+      $("#modifyBtn").click(function () {
+        let formData = new FormData(document.getElementById("org-details"));
+        $.ajax({
+          url: "/modify-org-details",
+          type: "POST",
+          data: formData,
+          contentType: false,
+          processData: false,
+          success: function (resp) {
+            alert(resp);
+          },
+          error: function (err) {
+            alert("Modify failed: " + err.responseText);
+          },
+        });
+      });
+
+      $("#saveBtn").click(function () {
+        event.preventDefault();
+        let formData = new FormData(document.getElementById("org-details"));
+        $.ajax({
+          url: "/save-org-details",
+          type: "POST",
+          data: formData,
+          contentType: false,
+          processData: false,
+          success: function (resp) {
+            alert(resp);
+          },
+          error: function (err) {
+            alert("Saving failed: " + err.responseText);
+          },
+        });
+      });
+
+      $("#picurl").change(function () {
+        let file = this.files[0];
+        if (file) {
+          let reader = new FileReader();
+          reader.onload = function (e) {
+            $("#preview").html(
+              `<img src="${e.target.result}" style="width:85%; height:85%; object-fit:cover;">`
+            );
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    </script>
+  </body>
+</html>

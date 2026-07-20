@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="tournamentApp">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Find Tournaments</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+      :root {
+        --midnight-navy: #0f172a;
+        --golden-yellow: #facc15;
+        --rich-burgundy: #7f1d1d;
+        --soft-cream: #f8fafc;
+      }
+
+      * {
+        font-family: "Inter", sans-serif;
+      }
+
+      .bg-midnight {
+        background-color: var(--midnight-navy) !important;
+      }
+
+      .bg-softcream {
+        background-color: var(--soft-cream) !important;
+      }
+
+      .bg-burgundy {
+        background-color: var(--rich-burgundy) !important;
+      }
+
+      .text-golden {
+        color: var(--golden-yellow) !important;
+      }
+
+      .text-cream {
+        color: var(--soft-cream) !important;
+      }
+      body {
+        background: #f8f9fa;
+        padding-top: 70px;
+      }
+      .card {
+        transition: transform 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+      .poster-img {
+        height: 230px;
+        object-fit: cover;
+      }
+      .navbar-brand {
+        margin-left: 30px;
+      }
+    </style>
+  </head>
+  <body ng-controller="TournamentController">
+    <nav class="navbar navbar-dark bg-burgundy fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand"> <span id="welcometxt"></span></a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h2 class="text-center mb-4">Find Tournaments</h2>
+
+      <div class="row mb-4 justify-content-center">
+        <div class="col-md-4 mb-2">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter City"
+            ng-model="searchCity"
+          />
+        </div>
+        <div class="col-md-4 mb-2">
+          <select class="form-select" ng-model="searchSport">
+            <option value="">All Sports</option>
+            <option value="Cricket">Cricket</option>
+            <option value="Football">Football</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Volleyball">Volleyball</option>
+            <option value="Hockey">Hockey</option>
+            <option value="Baseball">Baseball</option>
+            <option value="Rugby">Rugby</option>
+            <option value="American Football">American Football</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Table Tennis">Table Tennis</option>
+            <option value="Badminton">Badminton</option>
+            <option value="Kabaddi">Kabaddi</option>
+            <option value="Chess">Chess</option>
+            <option value="Carrom">Carrom</option>
+            <option value="Snooker">Snooker</option>
+            <option value="Billiards">Billiards</option>
+            <option value="Darts">Darts</option>
+            <option value="Squash">Squash</option>
+            <option value="Bowling">Bowling</option>
+            <option value="Athletics">Athletics</option>
+            <option value="Wrestling">Wrestling</option>
+            <option value="Boxing">Boxing</option>
+            <option value="Judo">Judo</option>
+            <option value="Karate">Karate</option>
+            <option value="Taekwondo">Taekwondo</option>
+            <option value="Mixed Martial Arts">Mixed Martial Arts</option>
+            <option value="Fencing">Fencing</option>
+            <option value="Archery">Archery</option>
+            <option value="Cycling">Cycling</option>
+            <option value="Horse Racing">Horse Racing</option>
+            <option value="Motor Racing">Motor Racing</option>
+            <option value="Formula 1">Formula 1</option>
+            <option value="Kart Racing">Kart Racing</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Surfing">Surfing</option>
+            <option value="Diving">Diving</option>
+            <option value="Water Polo">Water Polo</option>
+            <option value="Kayaking">Kayaking</option>
+            <option value="Canoeing">Canoeing</option>
+            <option value="Rowing">Rowing</option>
+            <option value="Sailing">Sailing</option>
+            <option value="Skydiving">Skydiving</option>
+            <option value="Paragliding">Paragliding</option>
+            <option value="Rock Climbing">Rock Climbing</option>
+            <option value="Mountaineering">Mountaineering</option>
+            <option value="Skiing">Skiing</option>
+            <option value="Snowboarding">Snowboarding</option>
+            <option value="Skateboarding">Skateboarding</option>
+            <option value="Roller Skating">Roller Skating</option>
+            <option value="Valorant">Valorant</option>
+            <option value="Counter Strike">Counter Strike</option>
+            <option value="PUBG">PUBG</option>
+            <option value="Free Fire">Free Fire</option>
+            <option value="Call of Duty">Call of Duty</option>
+            <option value="Mobile Legends">Mobile Legends</option>
+            <option value="Clash Royale">Clash Royale</option>
+            <option value="League of Legends">League of Legends</option>
+            <option value="Apex Legends">Apex Legends</option>
+            <option value="Overwatch">Overwatch</option>
+            <option value="Dota 2">Dota 2</option>
+            <option value="FIFA (eFootball)">FIFA (eFootball)</option>
+            <option value="Rocket League">Rocket League</option>
+            <option value="Golf">Golf</option>
+            <option value="Gymnastics">Gymnastics</option>
+            <option value="Horse Riding">Horse Riding</option>
+            <option value="Equestrian">Equestrian</option>
+            <option value="Lawn Bowls">Lawn Bowls</option>
+            <option value="Polo">Polo</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-2 d-grid gap-2">
+          <button
+            class="btn bg-midnight text-cream"
+            ng-click="searchTournaments()"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-4" ng-repeat="t in tournaments">
+          <div class="card h-100">
+            <img
+              ng-src="{{t.posterurl}}"
+              class="poster-img card-img-top"
+              alt="Poster"
+            />
+            <div class="card-body">
+              <h5 class="card-title">{{ t.event }}</h5>
+              <p class="card-text"><b>City:</b> {{ t.city }}</p>
+              <p class="card-text"><b>Sport:</b> {{ t.sports }}</p>
+              <p class="card-text"><b>Date:</b> {{ t.doe.split('T')[0] }}</p>
+              <button
+                class="btn btn-outline-primary w-100"
+                data-bs-toggle="modal"
+                data-bs-target="#detailsModal"
+                ng-click="showDetails(t)"
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center text-muted mt-4" ng-if="tournaments.length===0">
+        No tournaments found.
+      </div>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" ng-if="selectedTournament">
+          <div class="modal-header">
+            <h5 class="modal-title">{{selectedTournament.event}} Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <img
+              ng-src="{{ selectedTournament.posterurl }}"
+              class="img-fluid mb-3"
+            />
+            <p><b>Organizer Email:</b> {{ selectedTournament.emailid }}</p>
+            <p>
+              <b>Date:</b> {{ selectedTournament.doe }} {{
+              selectedTournament.toe }}
+            </p>
+            <p><b>City:</b> {{ selectedTournament.city }}</p>
+            <p><b>Location:</b> {{ selectedTournament.address }}</p>
+            <p>
+              <b>Age:</b> {{ selectedTournament.minage }} to {{
+              selectedTournament.maxage }}
+            </p>
+            <p>
+              <b>Last Date to Register:</b> {{ selectedTournament.lastdate }}
+            </p>
+            <p>
+              <b>Entry Fee:</b> ₹{{ selectedTournament.fee }} |
+              <b>Prize:</b> ₹{{ selectedTournament.prize }}
+            </p>
+            <p><b>Contact Person:</b> {{ selectedTournament.contact }}</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.getElementById("welcometxt").innerText =
+        localStorage.getItem("activeUser") || "User";
+
+      var app = angular.module("tournamentApp", []);
+      app.controller("TournamentController", function ($scope, $http) {
+        $scope.tournaments = [];
+        $scope.selectedTournament = null;
+
+        $scope.loadAllTournaments = function () {
+          $http
+            .get("/get-all-tournaments")
+            .then((res) => ($scope.tournaments = res.data))
+            .catch((err) => alert(" Failed to load tournaments"));
+        };
+
+        $scope.searchTournaments = function () {
+          const city = $scope.searchCity || "";
+          const sport = $scope.searchSport || "";
+          if (!city && !sport) return alert("Enter city or sport to search");
+          $http
+            .get(
+              `/search-tournaments?city=${encodeURIComponent(
+                city
+              )}&sports=${encodeURIComponent(sport)}`
+            )
+            .then((res) => ($scope.tournaments = res.data))
+            .catch((err) => alert(" Failed to search tournaments"));
+        };
+
+        $scope.showDetails = (t) => ($scope.selectedTournament = t);
+
+        $scope.loadAllTournaments();
+      });
+    </script>
+  </body>
+</html>

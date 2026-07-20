@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="userApp" ng-controller="userCtrl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin User Console</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      :root {
+        --midnight-navy: #0f172a;
+        --golden-yellow: #facc15;
+        --rich-burgundy: #7f1d1d;
+        --soft-cream: #f8fafc;
+      }
+
+      * {
+        font-family: "Inter", sans-serif;
+      }
+
+      .bg-midnight {
+        background-color: var(--midnight-navy) !important;
+      }
+
+      .bg-burgundy {
+        background-color: var(--rich-burgundy) !important;
+      }
+
+      .text-golden {
+        color: var(--golden-yellow) !important;
+      }
+
+      .text-cream {
+        color: var(--soft-cream) !important;
+      }
+      body {
+        background-color: #f1f1f1;
+        padding-top: 80px;
+      }
+      .table thead {
+        background: #343a40;
+        color: white;
+      }
+      .status-active {
+        color: green;
+        font-weight: bold;
+      }
+      .status-blocked {
+        color: red;
+        font-weight: bold;
+      }
+      .icon-btn {
+        font-size: 20px;
+        cursor: pointer;
+        margin-right: 8px;
+      }
+      .blocked {
+        color: red;
+      }
+      .active {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-burgundy fixed-top shadow">
+      <div class="container">
+        <span class="navbar-brand fw-bold text-golden"
+          >Users Admin Console</span
+        >
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <h3 class="text-center fw-bold mb-4">Users Admin Console</h3>
+
+      <table class="table table-bordered shadow-sm bg-white">
+        <thead>
+          <tr>
+            <th>Sr.no</th>
+            <th>Email ID</th>
+            <th>User Type</th>
+            <th>Status</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="u in users">
+            <td>{{$index+1}}</td>
+            <td>{{u.emailid}}</td>
+            <td>{{u.usertype}}</td>
+            <td>
+              <span
+                ng-class="{'status-active': u.status=='active', 'status-blocked': u.status=='blocked'}"
+              >
+                {{u.status | uppercase}}
+              </span>
+            </td>
+            <td>
+              <button
+                class="btn btn-sm btn-danger me-2"
+                ng-click="updateStatus(u.emailid, 'blocked')"
+                ng-if="u.status=='active'"
+              >
+                Block
+              </button>
+              <button
+                class="btn btn-sm btn-success"
+                ng-click="updateStatus(u.emailid, 'active')"
+                ng-if="u.status=='blocked'"
+              >
+                Unblock
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      var app = angular.module("userApp", []);
+      app.controller("userCtrl", function ($scope, $http) {
+        $scope.loadUsers = function () {
+          $http.get("/get-all-users").then(
+            function (res) {
+              $scope.users = res.data;
+            },
+            function () {
+              alert(" Failed to load users");
+            }
+          );
+        };
+
+        $scope.updateStatus = function (emailid, status) {
+          if (confirm(`Are you sure you want to ${status} ${emailid}?`)) {
+            $http.post("/update-user-status", { emailid, status }).then(
+              function (res) {
+                alert("✅ " + res.data);
+                $scope.loadUsers();
+              },
+              function () {
+                alert(" Failed to update status");
+              }
+            );
+          }
+        };
+
+        $scope.loadUsers();
+      });
+    </script>
+  </body>
+</html>

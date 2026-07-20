@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Post Tournament Form</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+    <style>
+      :root {
+        --midnight-navy: #0f172a;
+        --golden-yellow: #facc15;
+        --rich-burgundy: #7f1d1d;
+        --soft-cream: #f8fafc;
+      }
+
+      * {
+        font-family: "Inter", sans-serif;
+      }
+
+      .bg-midnight {
+        background-color: var(--midnight-navy) !important;
+      }
+
+      .bg-softcream {
+        background-color: var(--soft-cream) !important;
+      }
+
+      .bg-burgundy {
+        background-color: var(--rich-burgundy) !important;
+      }
+
+      .text-golden {
+        color: var(--golden-yellow) !important;
+      }
+
+      .text-cream {
+        color: var(--soft-cream) !important;
+      }
+      body {
+        background-color: #f8f9fa;
+        padding-top: 80px;
+      }
+      .form-container {
+        max-width: 950px;
+        margin: auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      }
+      footer {
+        background-color: var(--rich-burgundy);
+        color: var(--soft-cream);
+        padding: 25px 0;
+        margin-top: 50px;
+      }
+      .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-burgundy fixed-top shadow"
+    >
+      <div class="container d-flex justify-content-between">
+        <a class="navbar-brand fw-bold text-warning" href="#"
+          >Post Tournaments</a
+        >
+        <span class="text-white">
+          <span id="welcometxt" style="font-size: 20px"></span
+        ></span>
+      </div>
+    </nav>
+
+    <div class="form-container mt-4 mb-5 bg-softcream">
+      <form id="tournamentForm" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label>Email ID</label>
+          <input
+            type="email"
+            class="form-control"
+            id="emailid"
+            name="emailid"
+            readonly
+          />
+        </div>
+
+        <div class="mb-3">
+          <label>Tournament Poster</label>
+          <input type="file" class="form-control" name="poster" required />
+        </div>
+
+        <div class="mb-3">
+          <label>Event Title</label>
+          <input type="text" class="form-control" name="event" required />
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label>Date</label>
+            <input type="date" class="form-control" name="doe" required />
+          </div>
+          <div class="col-md-4">
+            <label>Time</label>
+            <input type="time" class="form-control" name="toe" required />
+          </div>
+          <div class="col-md-4">
+            <label>City</label>
+            <input type="text" class="form-control" name="city" required />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label>Location / Address</label>
+          <input type="text" class="form-control" name="address" required />
+        </div>
+
+        <div class="mb-3">
+          <label>Select Sport</label>
+          <select
+            class="form-control selectpicker"
+            name="sports"
+            required
+            data-live-search="true"
+            data-size="7"
+          >
+            <option value="" disabled selected>Choose Sport</option>
+            <option value="Cricket">Cricket</option>
+            <option value="Football">Football</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Volleyball">Volleyball</option>
+            <option value="Hockey">Hockey</option>
+            <option value="Baseball">Baseball</option>
+            <option value="Rugby">Rugby</option>
+            <option value="American Football">American Football</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Table Tennis">Table Tennis</option>
+            <option value="Badminton">Badminton</option>
+            <option value="Kabaddi">Kabaddi</option>
+            <option value="Chess">Chess</option>
+            <option value="Carrom">Carrom</option>
+            <option value="Snooker">Snooker</option>
+            <option value="Billiards">Billiards</option>
+            <option value="Darts">Darts</option>
+            <option value="Squash">Squash</option>
+            <option value="Bowling">Bowling</option>
+            <option value="Athletics">Athletics</option>
+            <option value="Wrestling">Wrestling</option>
+            <option value="Boxing">Boxing</option>
+            <option value="Judo">Judo</option>
+            <option value="Karate">Karate</option>
+            <option value="Taekwondo">Taekwondo</option>
+            <option value="Mixed Martial Arts">Mixed Martial Arts</option>
+            <option value="Fencing">Fencing</option>
+            <option value="Archery">Archery</option>
+            <option value="Cycling">Cycling</option>
+            <option value="Horse Racing">Horse Racing</option>
+            <option value="Motor Racing">Motor Racing</option>
+            <option value="Formula 1">Formula 1</option>
+            <option value="Kart Racing">Kart Racing</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Surfing">Surfing</option>
+            <option value="Diving">Diving</option>
+            <option value="Water Polo">Water Polo</option>
+            <option value="Kayaking">Kayaking</option>
+            <option value="Canoeing">Canoeing</option>
+            <option value="Rowing">Rowing</option>
+            <option value="Sailing">Sailing</option>
+            <option value="Skydiving">Skydiving</option>
+            <option value="Paragliding">Paragliding</option>
+            <option value="Rock Climbing">Rock Climbing</option>
+            <option value="Mountaineering">Mountaineering</option>
+            <option value="Skiing">Skiing</option>
+            <option value="Snowboarding">Snowboarding</option>
+            <option value="Skateboarding">Skateboarding</option>
+            <option value="Roller Skating">Roller Skating</option>
+            <option value="Valorant">Valorant</option>
+            <option value="Counter Strike">Counter Strike</option>
+            <option value="PUBG">PUBG</option>
+            <option value="Free Fire">Free Fire</option>
+            <option value="Call of Duty">Call of Duty</option>
+            <option value="Mobile Legends">Mobile Legends</option>
+            <option value="Clash Royale">Clash Royale</option>
+            <option value="League of Legends">League of Legends</option>
+            <option value="Apex Legends">Apex Legends</option>
+            <option value="Overwatch">Overwatch</option>
+            <option value="Dota 2">Dota 2</option>
+            <option value="FIFA (eFootball)">FIFA (eFootball)</option>
+            <option value="Rocket League">Rocket League</option>
+            <option value="Golf">Golf</option>
+            <option value="Gymnastics">Gymnastics</option>
+            <option value="Horse Riding">Horse Riding</option>
+            <option value="Equestrian">Equestrian</option>
+            <option value="Lawn Bowls">Lawn Bowls</option>
+            <option value="Polo">Polo</option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label>Min Age</label>
+            <input type="number" class="form-control" name="minage" required />
+          </div>
+          <div class="col-md-6">
+            <label>Max Age</label>
+            <input type="number" class="form-control" name="maxage" required />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label>Last Date of Registration</label>
+            <input type="date" class="form-control" name="lastdate" required />
+          </div>
+          <div class="col-md-6">
+            <label>Fee</label>
+            <input type="number" class="form-control" name="fee" required />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label>Prize Money</label>
+          <input type="number" class="form-control" name="prize" required />
+        </div>
+
+        <div class="mb-3">
+          <label>Contact Person</label>
+          <input type="text" class="form-control" name="contact" required />
+        </div>
+
+        <div class="text-center mb-3">
+          <button
+            type="button"
+            class="btn bg-midnight text-cream px-5"
+            id="btnSubmit"
+          >
+            Publish Tournament
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <footer class="py-4">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <p class="text-cream opacity-75 mb-0">© 2025 VictoryGrid</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#" class="text-cream opacity-75 text-decoration-none me-3"
+              >About</a
+            >
+            <a href="#" class="text-cream opacity-75 text-decoration-none me-3"
+              >Terms of Service</a
+            >
+            <a href="#" class="text-cream opacity-75 text-decoration-none me-3"
+              >Conatct</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      $(document).ready(function () {
+        $(".selectpicker").selectpicker();
+
+        let email = localStorage.getItem("activeUser") || "";
+        $("#welcometxt").text(email);
+        $("#emailid").val(email);
+
+        $("#btnSubmit").click(function () {
+          let fd = new FormData($("#tournamentForm")[0]);
+          $.ajax({
+            url: "/save-tournament",
+            type: "POST",
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+              alert(res);
+              $("#tournamentForm")[0].reset();
+              $("#emailid").val(email);
+            },
+            error: function (err) {
+              alert("❌ " + err.responseText);
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
