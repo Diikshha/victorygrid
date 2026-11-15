@@ -7,12 +7,11 @@ const fetch = require("node-fetch");
 const cors = require("cors");
 require("dotenv").config();
 const mysql = require("mysql2");
-
+const { Readable } = require("stream");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash-latest"
+    model: "gemini-3.5-flash-lite"
 });
 
 var app = express();
@@ -31,8 +30,69 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// AIVEN MYSQL DATABASE CONNECTION
+const sleep = (ms) =>
+    new Promise(resolve => setTimeout(resolve, ms));
 
+async function generateWithRetry(model, request) {
+
+    const maxRetries = 3;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+
+        try {
+            return await model.generateContent(request);
+
+        } catch (error) {
+
+            const status = error.status;
+
+            if (
+                status !== 503 &&
+                status !== 500 &&
+                status !== 429
+            ) {
+                throw error;
+            }
+
+            if (attempt === maxRetries) {
+                throw error;
+            }
+
+            const delay = 2000 * Math.pow(2, attempt);
+
+            console.log(
+                `Gemini temporarily unavailable. Retrying in ${delay / 1000} seconds...`
+            );
+
+            await sleep(delay);
+        }
+    }
+}
+
+// CLOUDINARY BUFFER UPLOAD FUNCTION
+function uploadBufferToCloudinary(buffer, folder = "aadhaar") {
+    return new Promise((resolve, reject) => {
+
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder,
+                resource_type: "image"
+            },
+            (error, result) => {
+
+                if (error) {
+                    return reject(error);
+                }
+
+                resolve(result);
+            }
+        );
+
+        Readable.from([buffer]).pipe(uploadStream);
+    });
+}
+
+// AIVEN MYSQL DATABASE CONNECTION
 const requiredDbEnv = [
     "DB_HOST",
     "DB_PORT",
@@ -44,7 +104,6 @@ const requiredDbEnv = [
 const missingDbEnv = requiredDbEnv.filter(
     (key) => !process.env[key]
 );
-
 if (missingDbEnv.length > 0) {
     console.error(
         "Missing database environment variables:",
@@ -73,12 +132,9 @@ const db = mysql.createPool({
     database: process.env.DB_NAME,
 
     ssl: {
-        ca: fs.readFileSync(
-            path.resolve(__dirname, process.env.DB_SSL_CA_PATH)
-        ),
+        ca: fs.readFileSync(caPath),
         rejectUnauthorized: true
     },
-
     waitForConnections: true,
     connectionLimit: 10,
     maxIdle: 5,
@@ -89,26 +145,6 @@ const db = mysql.createPool({
     keepAliveInitialDelay: 10000
 });
 
-// Test database connection
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error("AIVEN MYSQL CONNECTION ERROR:", err);
-        return;
-    }
-
-    console.log("AIVEN MYSQL CONNECTED SUCCESSFULLY");
-
-    connection.query("SELECT DATABASE() AS db", (queryErr, results) => {
-        if (queryErr) {
-            console.error("DATABASE TEST ERROR:", queryErr);
-        } else {
-            console.log("Connected database:", results[0].db);
-        }
-
-        connection.release();
-    });
-});
-
 // HOME ROUTE
 app.get("/", function (req, resp) {
     resp.sendFile(
@@ -117,7 +153,6 @@ app.get("/", function (req, resp) {
 });
 
 // CHECK EMAIL
-
 app.get("/chk-email", (req, res) => {
 
     const { emailid } = req.query;
@@ -150,7 +185,6 @@ app.get("/chk-email", (req, res) => {
 });
 
 // SIGNUP
-
 // Kept as GET for compatibility with your existing frontend.
 // Migrate to POST and bcrypt before production.
 
@@ -319,19 +353,17 @@ app.post("/save-org-details", async function (req, resp) {
 
         if (req.files && req.files.picurl) {
 
-            let fileObj = req.files.picurl;
+            const fileObj = req.files.picurl;
 
-            let localPath = path.join(
-                __dirname,
-                "public",
-                "uploads",
-                fileObj.name
-            );
+            if (!fileObj.data || !fileObj.mimetype.startsWith("image/")) {
+                return resp.status(400).send(
+                    "Please upload a valid organizer image."
+                );
+            }
 
-            await fileObj.mv(localPath);
-
-            let result = await cloudinary.uploader.upload(
-                localPath
+            const result = await uploadBufferToCloudinary(
+                fileObj.data,
+                "organizer-profiles"
             );
 
             picurl = result.secure_url;
@@ -444,19 +476,17 @@ app.post("/modify-org-details", async function (req, res) {
 
         if (req.files && req.files.picurl) {
 
-            let fileObj = req.files.picurl;
+            const fileObj = req.files.picurl;
 
-            let localPath = path.join(
-                __dirname,
-                "public",
-                "uploads",
-                fileObj.name
-            );
+            if (!fileObj.data || !fileObj.mimetype.startsWith("image/")) {
+                return res.status(400).send(
+                    "Please upload a valid organizer image."
+                );
+            }
 
-            await fileObj.mv(localPath);
-
-            let result = await cloudinary.uploader.upload(
-                localPath
+            const result = await uploadBufferToCloudinary(
+                fileObj.data,
+                "organizer-profiles"
             );
 
             picurl = result.secure_url;
@@ -520,13 +550,13 @@ app.post("/modify-org-details", async function (req, res) {
     }
 });
 
-
 // READ AADHAAR USING GEMINI AI
 
 app.post("/read-aadhaar", async function (req, res) {
 
     try {
 
+        // Check uploaded file
         if (!req.files || !req.files.acardpic) {
             return res.status(400).send(
                 "No Aadhaar file uploaded"
@@ -535,38 +565,55 @@ app.post("/read-aadhaar", async function (req, res) {
 
         const fileObj = req.files.acardpic;
 
-        const localPath = path.join(
-            __dirname,
-            "public",
-            "uploads",
-            fileObj.name
-        );
+        // Validate image
+        if (!fileObj.data || !fileObj.mimetype.startsWith("image/")) {
+            return res.status(400).send(
+                "Please upload a valid image"
+            );
+        }
 
-        await fileObj.mv(localPath);
-
+        // Upload directly from memory to Cloudinary
+        // No local public/uploads folder required
         const cloudinaryResult =
-            await cloudinary.uploader.upload(localPath);
+            await uploadBufferToCloudinary(
+                fileObj.data,
+                "aadhaar"
+            );
 
         const acardpicurl = cloudinaryResult.secure_url;
 
-        const imageBase64 = fs.readFileSync(
-            localPath,
-            { encoding: "base64" }
-        );
+        // Convert image buffer to Base64
+        const imageBase64 = fileObj.data.toString("base64");
 
+        // Gemini prompt
         const prompt = `
-From this Aadhaar card image, extract only:
-1. Name (as it appears)
-2. DOB (in DD/MM/YYYY format)
-3. Gender (Male/Female/Other)
+        Carefully read the uploaded Aadhaar card image.
 
-Respond in pure JSON without any extra text like below:
-{"name": "...", "dob": "DD/MM/YYYY", "gender": "..."}
+        Extract only these three fields:
+
+        1. Name exactly as printed.
+        2. Date of Birth in DD/MM/YYYY format.
+        3. Gender (Male, Female, or Other).
+
+        Important:
+        - Do not guess missing information.
+        - If a field is unclear, return an empty string.
+        - Return valid JSON only.
+        - Do not include markdown or explanations.
+
+        Expected format:
+        {
+            "name": "",
+            "dob": "",
+            "gender": ""
+        }
         `;
 
-        const result = await model.generateContent({
+        // Send image to Gemini
+        const result = await generateWithRetry(model, {
             contents: [
                 {
+                    role: "user",
                     parts: [
                         { text: prompt },
                         {
@@ -580,66 +627,57 @@ Respond in pure JSON without any extra text like below:
             ]
         });
 
-        let responseText = result.response
-            .text()
-            .replace(/```json|```/g, "")
-            .replace(/[\r\n]/g, "")
+        // Get Gemini response
+        let responseText = result.response.text()
+            .replace(/^```(?:json)?\s*/i, "")
+            .replace(/\s*```$/, "")
             .trim();
 
+        console.log("GEMINI AADHAAR RESPONSE:", responseText);
+
+        // Parse JSON
         let parsed;
 
         try {
             parsed = JSON.parse(responseText);
         } catch (err) {
-
-            console.error(
-                "JSON PARSE ERROR:",
-                err.message,
-                "RAW RESPONSE:",
-                responseText
-            );
+            console.error("GEMINI JSON PARSE ERROR:", err);
 
             return res.status(500).send(
-                "Failed to parse Aadhaar data!"
+                "Gemini returned invalid Aadhaar data"
             );
         }
 
-        let dob = (parsed.dob || "").trim();
+        // Convert DOB into YYYY-MM-DD
+        let dob = String(parsed.dob || "").trim();
 
-        if (dob.includes("/")) {
+        const dobMatch = dob.match(
+            /^(\d{2})\/(\d{2})\/(\d{4})$/
+        );
 
-            const [dd, mm, yyyy] = dob.split("/");
-
-            if (dd && mm && yyyy) {
-                dob = `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
-            }
-
-        } else if (dob.includes("-")) {
-
-            const [dd, mm, yyyy] = dob.split("-");
-
-            if (dd && mm && yyyy) {
-                dob = `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
-            }
-
-        } else {
+        if (dobMatch) {
+            const [, dd, mm, yyyy] = dobMatch;
+            dob = `${yyyy}-${mm}-${dd}`;
+        } else if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
             dob = "";
         }
 
-        res.json({
-            acardpicurl,
-            name: parsed.name?.trim() || "",
-            dob,
-            gender: parsed.gender?.trim() || ""
+        // Return extracted information
+        return res.json({
+            acardpicurl: acardpicurl,
+            name: String(parsed.name || "").trim(),
+            dob: dob,
+            gender: String(parsed.gender || "").trim()
         });
 
     } catch (error) {
 
         console.error("GEMINI / AADHAAR ERROR:", error);
 
-        res.status(500).send(
-            "Failed to read Aadhaar!"
-        );
+        return res.status(500).json({
+            error: "Failed to read Aadhaar!",
+            details: error.message
+        });
     }
 });
 
@@ -669,21 +707,20 @@ app.post("/save-player", async function (req, res) {
 
         let profilepicurl = "nopic.jpg";
 
+        // Upload profile picture directly to Cloudinary
         if (req.files && req.files.profilepic) {
 
-            let profileObj = req.files.profilepic;
+            const profileObj = req.files.profilepic;
 
-            let pathProf = path.join(
-                __dirname,
-                "public",
-                "uploads",
-                profileObj.name
-            );
+            if (!profileObj.data || !profileObj.mimetype.startsWith("image/")) {
+                return res.status(400).send(
+                    "Please upload a valid profile image."
+                );
+            }
 
-            await profileObj.mv(pathProf);
-
-            let result = await cloudinary.uploader.upload(
-                pathProf
+            const result = await uploadBufferToCloudinary(
+                profileObj.data,
+                "player-profiles"
             );
 
             profilepicurl = result.secure_url;
@@ -763,21 +800,20 @@ app.post("/modify-player", async function (req, res) {
 
         let profilepicurl = existingProfilePic || "nopic.jpg";
 
+        // Upload new profile picture directly to Cloudinary
         if (req.files && req.files.profilepic) {
 
-            let profileObj = req.files.profilepic;
+            const profileObj = req.files.profilepic;
 
-            let pathProf = path.join(
-                __dirname,
-                "public",
-                "uploads",
-                profileObj.name
-            );
+            if (!profileObj.data || !profileObj.mimetype.startsWith("image/")) {
+                return res.status(400).send(
+                    "Please upload a valid profile image."
+                );
+            }
 
-            await profileObj.mv(pathProf);
-
-            let result = await cloudinary.uploader.upload(
-                pathProf
+            const result = await uploadBufferToCloudinary(
+                profileObj.data,
+                "player-profiles"
             );
 
             profilepicurl = result.secure_url;
@@ -858,8 +894,6 @@ app.get("/get-player", function (req, res) {
     });
 });
 
-
-
 // SAVE TOURNAMENT
 
 app.post("/save-tournament", function (req, resp) {
@@ -872,8 +906,17 @@ app.post("/save-tournament", function (req, resp) {
 
     const posterFile = req.files.poster;
 
+    if (!posterFile.data || !posterFile.mimetype.startsWith("image/")) {
+        return resp.status(400).send(
+            "Please upload a valid tournament poster."
+        );
+    }
+
     const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "tournaments" },
+        {
+            folder: "tournaments",
+            resource_type: "image"
+        },
         function (err, result) {
 
             if (err) {
@@ -1167,6 +1210,7 @@ app.get("/get-all-players", (req, res) => {
 });
 
 // START SERVER AFTER DATABASE CONNECTION
+
 db.getConnection((err, connection) => {
 
     if (err) {
@@ -1186,7 +1230,11 @@ db.getConnection((err, connection) => {
             connection.release();
 
             if (queryErr) {
-                console.error("DATABASE VERIFICATION FAILED:", queryErr);
+                console.error(
+                    "DATABASE VERIFICATION FAILED:",
+                    queryErr
+                );
+
                 process.exit(1);
             }
 
